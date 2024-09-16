@@ -1,8 +1,26 @@
 <?php
 include '../koneksi.php';
-?>
 
+if (isset($_GET['id_galeri'])) {
+  $id_galeri = ($_GET['id_galeri']);
+  $query = "SELECT * FROM galeri WHERE id_galeri='$id_galeri'";
+  $result = mysqli_query($koneksi, $query);
+  if (!$result) {
+    die('Query error:' . mysqli_errno($koneksi) . "-" . mysqli_error($koneksi));
+  }
+  $data = mysqli_fetch_assoc($result);
+  if (!count($data)) {
+    echo "<script>alert('Data tida ditemukan di database');window.location='galeri.php';</script>";
+  }
+} else {
+  echo "<script>alert('Masukkan Data');window.location='galeri.php';</script>";
+}
+?>
 <!DOCTYPE html>
+<!--
+This is a starter template page. Use this page to start your new project from
+scratch. This page gets rid of all links and provides the needed markup only.
+-->
 <html lang="en">
 
 <head>
@@ -67,7 +85,7 @@ include '../koneksi.php';
         <div class="container">
           <div class="row mb-2">
             <div class="col-sm-6">
-              <h1 class="m-0">Galeri Hotel</h1>
+              <h1 class="m-0">Galeri</h1>
             </div><!-- /.col -->
           </div><!-- /.row -->
         </div><!-- /.container-fluid -->
@@ -80,46 +98,22 @@ include '../koneksi.php';
           <div class="col-md-12">
             <div class="card card-outline card-info">
               <div class="card-header">
-                <button class="btn btn-sm btn-primary " data-toggle="modal" data-target="#tambah">
-                  Tambah
-                </button>
+                <h3>Edit Data Galeri</h3>
               </div>
               <div class="card-body">
-
-                <table class="table table-bordered">
-                  <thead>
-                    <tr>
-                      <th style="width: 10px">#</th>
-                      <th>Keterangan</th>
-                      <th>Foto</th>
-                      <th>Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <?php
-                    $query = "SELECT * FROM galeri ORDER BY id_galeri ASC";
-                    $result = mysqli_query($koneksi, $query);
-                    if (!$result) {
-                      die("Query error: " . mysqli_errno($koneksi) . "-" . mysqli_error($koneksi));
-                    }
-                    $no = 1;
-                    while ($row = mysqli_fetch_assoc($result)) {
-                    ?>
-                      <tr>
-                        <td><?php echo "$no"; ?></td>
-                        <td><?php echo $row['keterangan']; ?></td>
-                        <td>
-                          <img class="d-block" src="gambar/<?php echo $row['foto']; ?>" width="200">
-                        </td>
-                        <td>
-                          <a href="edit_galeri.php?id_galeri=<?php echo $row['id_galeri']; ?>" class="btn btn btn-warning">Edit</a>
-                          <a href="hapus_galeri.php?id_galeri=<?php echo $row['id_galeri']; ?>" class="btn btn btn-danger">Hapus</a>
-                        </td>
-                      </tr>
-                    <?php $no++;
-                    } ?>
-                    </trbody>
-                </table>
+                <form method="post" action="update_galeri.php" enctype="multipart/form-data">
+                  <div class="form-group">
+                    <label>Keterangan</label>
+                    <input name="id_galeri" value="<?php echo $data['id_galeri']; ?>" hidden>
+                    <input type="text" class="form-control" value="<?php echo $data['keterangan']; ?>" name="keterangan" placeholder="Keterangan">
+                  </div>
+                  <div class="form-group">
+                    <label>Foto</label>
+                    <img class="d-block" src="gambar/<?php echo $data['foto']; ?>" width="200">
+                    <input type="file" name="foto" class="form-control">
+                  </div>
+                  <button type="submit" class="btn btn-primary">Update</button>
+                </form>
 
               </div>
             </div>
@@ -157,32 +151,6 @@ include '../koneksi.php';
   <script src="../asset/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
   <!-- AdminLTE App -->
   <script src="../asset/dist/js/adminlte.min.js"></script>
-  <div class="modal fade" id="tambah">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Tambah Data Galeri</h4>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form action="tambah_galeri.php" method="POST" enctype="multipart/form-data">
-            <div class="form-group">
-              <label>Keterangan</label>
-              <input type="text" name="keterangan" class="form-control" placeholder="Nama">
-            </div>
-            <div class="form-group">
-              <label>Foto</label>
-              <input type="file" name="foto" class="form-control">
-            </div>
-        </div>
-        <div class="modal-footer justify-content-between">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Simpan</button>
-        </div>
-        </form>
-      </div>
 </body>
 
 </html>
